@@ -15,7 +15,7 @@
 
 static char usb_vid[0x10],usb_pid[0x10];
 static char busb_vid[5],busb_pid[5];
-
+int switchcount = 0;
 
 
 static void do_coldboot(DIR *d, int lvl)
@@ -194,10 +194,11 @@ void handleUsbEvent(struct uevent *evt)
   			 fcmd=popen("getprop SWITCH_PID", "r");
    			 fgets(oldPid, sizeof(oldPid), fcmd);
   			 pclose(fcmd);
-		// rózne = PRAWDA		rozne = PRAWDA
+		switchcount++;
 		if((oldVid[0]!=0xA && oldPid[0]!=0xA) || (oldPid[0]!=0xA && strcmp(oldPid,usb_pid))) {
 		SLOGI("Old device was %s_%s\n",oldVid,oldPid);
-		SLOGI("Device already switched, skipping...\n");	
+		SLOGI("Device already switched, skipping...\n");
+		addmanually(usb_vid,usb_pid);	
 		}
 		else {
 	//	if(strncmp(usb_vid,oldVid,4) || strncmp(usb_pid,oldPid,4)) {
@@ -227,13 +228,14 @@ void handleUsbEvent(struct uevent *evt)
    			 fgets(oldPid, sizeof(oldPid), fcmd);
   			 pclose(fcmd);
   		system("log -t USB3G `ls /dev/ttyU*`");
-        if(strcmp(usb_pid,oldPid) && oldPid[0] != 0xA) {
+        if((strcmp(usb_pid,oldPid) && oldPid[0] != 0xA) || switchcount>1){
         asprintf(&cmd,"setprop SWITCH_VID \"\" &");
         system(cmd);
         free(cmd);
         asprintf(&cmd,"setprop SWITCH_PID \"\" &");
         system(cmd);
         free(cmd);
+        switchcount = 0;
          }
 	}
 }    
