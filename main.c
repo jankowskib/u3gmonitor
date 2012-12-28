@@ -172,6 +172,18 @@ void handleUsbEvent(struct uevent *evt)
 		if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"1514",4)) {
 		SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
+		}	
+		if(!strncmp(usb_vid,"0bda",4) && !strncmp(usb_pid,"8176",4)) {
+		SLOGI("Internal wifi module detected, skipping...\n");
+		return;
+		}	
+		if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"1515",4)) {
+		SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...\n");
+		addmanually(usb_vid,usb_pid);
+		}				
+		if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"0167",4)) {
+		SLOGI("Probably ZTE MF821 connected...Adding manually to option drv...\n");
+		addmanually(usb_vid,usb_pid);
 		}		
 		if(!strncmp(usb_vid,"0421",4) && !strncmp(usb_pid,"061e",4)) {
 		SLOGI("Probably NOKIA CS-11 connected...Adding manually to option drv...\n");
@@ -195,10 +207,16 @@ void handleUsbEvent(struct uevent *evt)
    			 fgets(oldPid, sizeof(oldPid), fcmd);
   			 pclose(fcmd);
 		switchcount++;
+		if(!strncmp(oldVid,"19d2",4) && !strncmp(oldPid,"f006",4) && !strncmp(usb_pid,"2000",4)) {
+		SLOGI("Probably ZTE K3570-Z connected...Reseting...\n");
+		switchcount--;
+		oldVid[0]=0xA;
+		oldPid[0]=0xA;
+		}	
 		if((oldVid[0]!=0xA && oldPid[0]!=0xA) || (oldPid[0]!=0xA && strcmp(oldPid,usb_pid))) {
 		SLOGI("Old device was %s_%s\n",oldVid,oldPid);
 		SLOGI("Device already switched, skipping...\n");
-		addmanually(usb_vid,usb_pid);	
+		//addmanually(usb_vid,usb_pid);	
 		}
 		else {
 	//	if(strncmp(usb_vid,oldVid,4) || strncmp(usb_pid,oldPid,4)) {
