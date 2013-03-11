@@ -204,15 +204,13 @@ void handleUsbEvent(struct uevent *evt)
 		SLOGI("A D-Link MODEM connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
 		}	
-		
-	//	asprintf(&cmd, "%s%s_%s &","/system/etc/usb_modeswitch.sh /system/etc/usb_modeswitch.d/",usb_vid,usb_pid);
-		     FILE *fcmd=popen("getprop SWITCH_VID", "r");
-   			 fgets(oldVid, sizeof(oldVid), fcmd);
-  			 pclose(fcmd);
-  			 
-  			 fcmd=popen("getprop SWITCH_PID", "r");
-   			 fgets(oldPid, sizeof(oldPid), fcmd);
-  			 pclose(fcmd);
+		FILE *fcmd=popen("getprop SWITCH_VID", "r");
+		fgets(oldVid, sizeof(oldVid), fcmd);
+		pclose(fcmd);
+		 
+		fcmd=popen("getprop SWITCH_PID", "r");
+		fgets(oldPid, sizeof(oldPid), fcmd);
+	    pclose(fcmd);
 		switchcount++;
 		if(!strncmp(oldVid,"19d2",4) && !strncmp(oldPid,"f006",4) && !strncmp(usb_pid,"2000",4)) {
 		SLOGI("Probably ZTE K3570-Z connected...Reseting...\n");
@@ -226,8 +224,6 @@ void handleUsbEvent(struct uevent *evt)
 		//addmanually(usb_vid,usb_pid);	
 		}
 		else {
-	//	if(strncmp(usb_vid,oldVid,4) || strncmp(usb_pid,oldPid,4)) {
-		SLOGI("USB3G -- modified by MODECOM S.A\n"); 
 		asprintf(&cmd, "/system/etc/usb_modeswitch.sh \"-v %s -p %s -c /system/etc/usb_modeswitch.d/%s_%s\" &",usb_vid, usb_pid,usb_vid,usb_pid);
 		SLOGI("cmd=%s,", cmd);
         ret = system(cmd); 
@@ -249,10 +245,9 @@ void handleUsbEvent(struct uevent *evt)
 		SLOGI("event { '%s', '%s', '%s', '%s', %d, %d }\n", evt->action, evt->path, evt->subsystem,
                     evt->firmware, evt->major, evt->minor);
                     
-             FILE *fcmd=popen("getprop SWITCH_PID", "r");
-   			 fgets(oldPid, sizeof(oldPid), fcmd);
-  			 pclose(fcmd);
-  		system("log -t USB3G `ls /dev/ttyU*`");
+        FILE *fcmd=popen("getprop SWITCH_PID", "r");
+   		fgets(oldPid, sizeof(oldPid), fcmd);
+  		pclose(fcmd);		
         if((strcmp(usb_pid,oldPid) && oldPid[0] != 0xA) || switchcount>1){
         asprintf(&cmd,"setprop SWITCH_VID \"\" &");
         system(cmd);
@@ -271,14 +266,14 @@ static void on_uevent(struct uevent *event)
 	const char *subsys = event->subsystem;
                    
 	if (!strcmp(subsys, "usb")) {
-    	handleUsbEvent(event);	//此函数需要在 Event类中添加
+    	handleUsbEvent(event);
     }                    
     
 }
 
 int main()
 {
-	SLOGI("usb 3g monitor v0.1c start");
+	SLOGI("USB3G Monitor ver. 0.1d fixed by lolet -- built on %s, %s\n",__DATE__, __TIME__); 
 	
 	uevent_init();
 	coldboot("/sys/devices");
