@@ -84,7 +84,6 @@ int read_vid_pid(char * path)
 		SLOGE("Vid :err\n");
 		return -1;	
 	}	
-	//最后一个字符是换行符号，需要去掉
 	usb_vid[size-1] = 0;
 	
 	//read Pid
@@ -101,7 +100,6 @@ int read_vid_pid(char * path)
 		SLOGE("Pid :err\n");	
 		return -1;
 	}	
-	//最后一个字符是换行符号，需要去掉
 	usb_pid[size-1] = 0;
 	
 	return 0;
@@ -132,9 +130,9 @@ void handleUsbEvent(struct uevent *evt)
     char oldVid[5] = "0000", oldPid[5] = "0000";
     
 
-                    
-
-    //如下判断设备类型，和是否为add模式。 进行相应操作  
+      		SLOGI("event { '%s', '%s', '%s', '%s', %d, %d }\n", evt->action, evt->path, evt->subsystem,
+                    evt->firmware, evt->major, evt->minor);              
+					
     if(!strcmp(evt->action, "add") && !strcmp(devtype, "usb_device")) {   
     
               /*call usb mode switch function*/  
@@ -147,9 +145,6 @@ void handleUsbEvent(struct uevent *evt)
         	return;	
         }	
         p += sizeof("usb");
-        /*如果是usb控制器则上报类似如下path：  /devices/platform/sw-ehci.1/usb*
-          如果是外设插入则上报类似如下path：   /devices/platform/sw-ehci.1/usb1/1-1/1-1.7   
-        */
         p = strchr(p,'-');
         if(p == NULL)     
         {
@@ -173,28 +168,40 @@ void handleUsbEvent(struct uevent *evt)
 		SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
 		}	
-		if(!strncmp(usb_vid,"0bda",4) && !strncmp(usb_pid,"8176",4)) {
+		else if(!strncmp(usb_vid,"0bda",4) && !strncmp(usb_pid,"8176",4)) {
 		SLOGI("Internal wifi module detected, skipping...\n");
 		return;
 		}	
-		if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"1515",4)) {
+		else if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"1515",4)) {
 		SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
+		}			
+		else if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"1506",4)) {
+		SLOGI("Probably ZTE MF398u1 connected...Adding manually to option drv...\n");
+		addmanually(usb_vid,usb_pid);
 		}				
-		if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"0167",4)) {
+		else if(!strncmp(usb_vid,"19d2",4) && !strncmp(usb_pid,"0167",4)) {
 		SLOGI("Probably ZTE MF821 connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
 		}		
-		if(!strncmp(usb_vid,"0421",4) && !strncmp(usb_pid,"061e",4)) {
+		else if(!strncmp(usb_vid,"0421",4) && !strncmp(usb_pid,"061e",4)) {
 		SLOGI("Probably NOKIA CS-11 connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
 		}	
-	    if(!strncmp(usb_vid,"0421",4) && !strncmp(usb_pid,"0638",4)) {
+	    else if(!strncmp(usb_vid,"0421",4) && !strncmp(usb_pid,"0638",4)) {
 		SLOGI("Probably NOKIA 21M-02 connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
 		}	
-		if(!strncmp(usb_vid,"0af0",4) && !strncmp(usb_pid,"d157",4)) {
+		else if(!strncmp(usb_vid,"0af0",4) && !strncmp(usb_pid,"d157",4)) {
 		SLOGI("Probably OPTION ICON 515M connected...Adding manually to option drv...\n");
+		addmanually(usb_vid,usb_pid);
+		}	
+		else if(!strncmp(usb_vid,"12d1",4) && !strncmp(usb_pid,"1411",4)) {
+		SLOGI("HUAWEI E510 connected...Adding manually to option drv...\n");
+		addmanually(usb_vid,usb_pid);
+		}
+		else if(!strncmp(usb_vid,"2001",4) && (!strncmp(usb_pid,"7d01",4) || !strncmp(usb_pid,"7d02",4) || !strncmp(usb_pid,"7d03",4))) {
+		SLOGI("A D-Link MODEM connected...Adding manually to option drv...\n");
 		addmanually(usb_vid,usb_pid);
 		}	
 		
@@ -271,7 +278,7 @@ static void on_uevent(struct uevent *event)
 
 int main()
 {
-	SLOGI("usb 3g monitor v0.1b start");
+	SLOGI("usb 3g monitor v0.1c start");
 	
 	uevent_init();
 	coldboot("/sys/devices");
