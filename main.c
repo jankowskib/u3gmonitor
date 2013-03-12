@@ -13,9 +13,9 @@
 
 #include "UEventFramework.h"
 
-static char usb_vid[0x10],usb_pid[0x10];
-static char busb_vid[5],busb_pid[5];
-int switchcount = 0;
+static char usb_vid[0x10], usb_pid[0x10];
+static char busb_vid[5], busb_pid[5];
+static int switchcount = 0;
 
 
 static void do_coldboot(DIR *d, int lvl)
@@ -81,12 +81,11 @@ int read_vid_pid(char * path)
 	SLOGI("VID :size %d,vid_path '%s',VID  '%s'.\n",size,usb_path,usb_vid);	
 	if(size<=0)
 	{
-		SLOGE("Vid :err\n");
+		SLOGE("VID :err\n");
 		return -1;	
 	}	
 	usb_vid[size-1] = 0;
 	
-	//read Pid
 	memset(usb_path,0,0x60);
 	strcat(usb_path,path);
 	strcat(usb_path,"/idProduct");
@@ -97,7 +96,7 @@ int read_vid_pid(char * path)
 	SLOGI("PID :size %d,Pid_path '%s',PID  '%s'.\n",size,usb_path,usb_pid);	
 	if(size<=0)
 	{
-		SLOGE("Pid :err\n");	
+		SLOGE("PID :err\n");	
 		return -1;
 	}	
 	usb_pid[size-1] = 0;
@@ -118,7 +117,7 @@ void handleUsbEvent(struct uevent *evt)
 {
 	pid_t pid;
     const char *devtype = evt->devtype;  
-    char *p,*cmd = NULL, path[0x60] = {0};  
+    char *p, *cmd = NULL, path[0x60] = {0};  
     char *argv_rc[] =
 	{
 		NULL,
@@ -130,35 +129,27 @@ void handleUsbEvent(struct uevent *evt)
     char oldVid[5] = "0000", oldPid[5] = "0000";
     
 
-      		SLOGI("event { '%s', '%s', '%s', '%s', %d, %d }\n", evt->action, evt->path, evt->subsystem,
-                    evt->firmware, evt->major, evt->minor);              
+		SLOGI("event { '%s', '%s', '%s', '%s', %d, %d }\n", evt->action, evt->path, evt->subsystem, evt->firmware, evt->major, evt->minor);              
 					
-    if(!strcmp(evt->action, "add") && !strcmp(devtype, "usb_device")) {   
+		if(!strcmp(evt->action, "add") && !strcmp(devtype, "usb_device")) {   
     
-              /*call usb mode switch function*/  
-		SLOGI("event { '%s', '%s', '%s', '%s', %d, %d }\n", evt->action, evt->path, evt->subsystem,
-                    evt->firmware, evt->major, evt->minor);  
-                    
-                 p = strstr(evt->path,"usb");
+        /*call usb mode switch function*/  
+		SLOGI("event { '%s', '%s', '%s', '%s', %d, %d }\n", evt->action, evt->path, evt->subsystem, evt->firmware, evt->major, evt->minor);   
+		p = strstr(evt->path,"usb");
+		
         if(p == NULL)     
         {
         	return;	
         }	
         p += sizeof("usb");
         p = strchr(p,'-');
-        if(p == NULL)     
-        {
-        	return;	
-        }	    
+        if(!p) return;	
           
         strcat(path,"/sys");
         strcat(path,evt->path);
         SLOGI("path : '%s'\n",path); 
         ret = read_vid_pid(path);
-        if((ret < 0) || (usb_pid == NULL) || (usb_vid == NULL))
-        {
-        	return;	
-        }  
+        if((ret < 0) || (usb_pid == NULL) || (usb_vid == NULL)) return;	
                
         // add for zoomdata,StrongRising 3g dongle
         if(!strncmp(usb_vid,"8888",4)&& !strncmp(usb_pid, "6500",4))
@@ -224,8 +215,12 @@ void handleUsbEvent(struct uevent *evt)
 		//addmanually(usb_vid,usb_pid);	
 		}
 		else {
-		asprintf(&cmd, "/system/etc/usb_modeswitch.sh \"-v %s -p %s -c /system/etc/usb_modeswitch.d/%s_%s\" &",usb_vid, usb_pid,usb_vid,usb_pid);
-		SLOGI("cmd=%s,", cmd);
+		char fname[255] = {0};
+		sprintf(fname,"/system/etc/usb_modeswitch.d/%s_%s",usb_vid, usb_pid);
+		FILE * f = fopen(fname,"r");
+		if(!f) SLOGI("Warning! Configuration file doesn't exist for %s_%s!",usb_vid, usb_pid);
+		else fclose(f);
+		asprintf(&cmd, "/system/bin/usb_modeswitch -W -I \"-v %s -p %s -c %s\" &",usb_vid, usb_pid, fname);
         ret = system(cmd); 
         free(cmd);
         SLOGI("excute ret : %d,err:%s\n",ret,strerror(errno));
@@ -273,7 +268,7 @@ static void on_uevent(struct uevent *event)
 
 int main()
 {
-	SLOGI("USB3G Monitor ver. 0.1d fixed by lolet -- built on %s, %s\n",__DATE__, __TIME__); 
+	SLOGI("USB3G Monitor ver. 0.1e fixed by lolet -- built on %s, %s\n",__DATE__, __TIME__); 
 	
 	uevent_init();
 	coldboot("/sys/devices");
