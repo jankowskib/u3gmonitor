@@ -18,6 +18,9 @@ This is my implementation of u3gmonitor, originally developed by ALLWINNER TECH 
 <dl>
   <dt>Installation guide</dt>
   <dd>
+ * Copy to /system/bin, change ownership to root: shell, chmod to 755
+  </dd>  
+  <dd>
  * Add service to init.rc:
   </dd>  
 </dl>
