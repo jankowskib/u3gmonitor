@@ -7,7 +7,11 @@ This is my implementation of u3gmonitor, originally developed by ALLWINNER TECH 
   <dt>What it does?</dt>
   <dd>
  * It watches for connected USB devices
+   </dd>
+      <dd>
  * Automatically calls usb_modeswitch
+    </dd>
+   <dd>
  * Contains some workaround for dongles, which aren't recognized by usb option driver
   </dd>
 </dl>
