@@ -15,3 +15,15 @@ This is my implementation of u3gmonitor, originally developed by ALLWINNER TECH 
  * Contains some workaround for dongles, which aren't recognized by usb option driver
   </dd>
 </dl>
+<dl>
+  <dt>Installation guide</dt>
+  <dd>
+ * Add service to init.rc:
+		service u3gmonitor /system/bin/u3gmonitor
+		class main
+		user root
+		group root
+		oneshot
+  </dd>
+   
+</dl>
