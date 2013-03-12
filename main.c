@@ -81,29 +81,29 @@ int read_vid_pid(char * path)
 	strcat(usb_path,"/idVendor");
 	fd=open(usb_path,O_RDONLY);
 	size=read(fd,usb_vid,sizeof(usb_vid));
+	usb_vid[size-1] = 0;
 	close(fd);
 	SLOGI("VID: size %d, vid_path '%s',VID  '%s'",size,usb_path,usb_vid);	
 	if(size<=0)
 	{
-		SLOGE("VID: err");
+		SLOGE("Failed to obtain device vendor id");	
 		return -1;	
 	}	
-	usb_vid[size-1] = 0;
 	
 	memset(usb_path,0,0x60);
 	strcat(usb_path,path);
 	strcat(usb_path,"/idProduct");
 	fd=open(usb_path,O_RDONLY);
 	size=read(fd,usb_pid,sizeof(usb_pid));
+	usb_pid[size-1] = 0;
 	close(fd);
-
 	SLOGI("PID: size %d, Pid_path '%s',PID  '%s'",size,usb_path,usb_pid);	
 	if(size<=0)
 	{
-		SLOGE("PID: err");	
+		SLOGE("Failed to obtain device product id");	
 		return -1;
 	}	
-	usb_pid[size-1] = 0;
+
 	
 	return 0;
 }
