@@ -19,11 +19,10 @@ This is my implementation of u3gmonitor, originally developed by ALLWINNER TECH 
   <dt>Installation guide</dt>
   <dd>
  * Add service to init.rc:
-		service u3gmonitor /system/bin/u3gmonitor
-		class main
-		user root
-		group root
-		oneshot
-  </dd>
-   
+  </dd>  
 </dl>
+	service u3gmonitor /system/bin/u3gmonitor
+	class main
+	user root
+	group root
+	oneshot
