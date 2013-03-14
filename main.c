@@ -123,8 +123,8 @@ const char *devtype = evt->devtype;
 char *p, *cmd = NULL, path[0x60] = {0};  
 int ret,status;
 char buffer[256] = {0};
-char oldVid[255] = {0};
-char oldPid[255] = {0};
+char oldVid[PROPERTY_VALUE_MAX] = {0};
+char oldPid[PROPERTY_VALUE_MAX] = {0};
     
 
 	//SLOGI("event {'%s', '%s', '%s', '%s', %d, %d}", evt->action, evt->path, evt->subsystem, evt->firmware, evt->major, evt->minor);              				
@@ -197,8 +197,8 @@ char oldPid[255] = {0};
 			SLOGI("A D-Link MODEM connected...Adding manually to option drv...\n");
 			addmanually(usb_vid,usb_pid);
 		}	
-		property_get("SWITCH_VID",oldVid,"");
-		property_get("SWITCH_PID",oldPid,"");
+		property_get("gsm.ril.switch.vid",oldVid,"");
+		property_get("gsm.ril.switch.pid",oldPid,"");
 		switchcount++;
 		
 		if(!strncasecmp(oldVid,"19d2",4) && !strncasecmp(oldPid,"f006",4) && !strncasecmp(usb_pid,"2000",4)) 
@@ -230,8 +230,8 @@ char oldPid[255] = {0};
 			if(!strcmp(oldPid, ""))
 			{
 				SLOGI("Setting envs to %s and %s",usb_vid,usb_pid);
-				property_set("SWITCH_VID",usb_vid);
-				property_set("SWITCH_PID",usb_pid);
+				property_set("gsm.ril.switch.vid",usb_vid);
+				property_set("gsm.ril.switch.pid",usb_pid);
 			}
 		}
 	} 
@@ -240,13 +240,13 @@ char oldPid[255] = {0};
 		SLOGI("event {'%s', '%s', '%s', '%s', %d, %d}", evt->action, evt->path, evt->subsystem,
 					evt->firmware, evt->major, evt->minor);
 					
-		property_get("SWITCH_PID", oldPid, "");		
-		property_get("SWITCH_PID", oldVid, "");	
+		property_get("gsm.ril.switch.pid", oldPid, "");		
+		property_get("gsm.ril.switch.pid", oldVid, "");	
 		if((strncasecmp(usb_pid, oldPid, 4) && strcmp(oldPid, "")) || switchcount > 1)
 		{
 			SLOGI("Clearing envs", usb_vid, usb_pid);
-			property_set("SWITCH_VID","");
-			property_set("SWITCH_PID","");
+			property_set("gsm.ril.switch.vid","");
+			property_set("gsm.ril.switch.pid","");
 			switchcount = 0;
 		}
 	}
