@@ -83,7 +83,7 @@ int read_vid_pid(char * path)
 	size=read(fd,usb_vid,sizeof(usb_vid));
 	usb_vid[size-1] = 0;
 	close(fd);
-	SLOGI("VID: size %d, vid_path '%s',VID  '%s'",size,usb_path,usb_vid);	
+	SLOGI("vid_path '%s',VID  '%s'",usb_path,usb_vid);	
 	if(size<=0)
 	{
 		SLOGE("Failed to obtain device vendor id");	
@@ -97,7 +97,7 @@ int read_vid_pid(char * path)
 	size=read(fd,usb_pid,sizeof(usb_pid));
 	usb_pid[size-1] = 0;
 	close(fd);
-	SLOGI("PID: size %d, Pid_path '%s',PID  '%s'",size,usb_path,usb_pid);	
+	SLOGI("pid_path '%s',PID  '%s'",usb_path,usb_pid);	
 	if(size<=0)
 	{
 		SLOGE("Failed to obtain device product id");	
@@ -147,54 +147,54 @@ char oldPid[PROPERTY_VALUE_MAX] = {0};
 		// add for zoomdata,StrongRising 3g dongle
 		if(!strncasecmp(usb_vid,"8888",4) && !strncasecmp(usb_pid, "6500",4)) sleep(8);
 		// work around for various dongles -- bartoszj
-		if(!strncasecmp(usb_vid,"19d2",4) && !strncasecmp(usb_pid,"1514",4)) 
-		{
-			SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...\n");
-			addmanually(usb_vid, usb_pid);
-		}	
 		else if	(!strncasecmp(usb_vid,"0bda",4))  // Skip REALTEK vendor id
 		{
-			SLOGI("Internal wifi module detected, skipping...\n");
+			SLOGI("Internal wifi module detected, skipping...");
 			return;
 		}	
-		else if(!strncasecmp(usb_vid,"19d2",4) && !strncasecmp(usb_pid,"1515",4)) 
+		else if(!strncasecmp(usb_vid,"12d1",4) && !strncasecmp(usb_pid,"1506",4))
 		{
-			SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...\n");
+			SLOGI("Probably HUAWEI E3276s connected...Adding manually to option drv...");
+			addmanually(usb_vid, usb_pid);
+		}	
+		else if((!strncasecmp(usb_vid,"19d2",4) && !strncasecmp(usb_pid,"1515",4)) || (!strncasecmp(usb_vid,"19d2",4) && !strncasecmp(usb_pid,"1514",4))) 
+		{
+			SLOGI("Probably ZTE MF195 connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}			
 		else if(!strncasecmp(usb_vid,"19d2",4) && !strncasecmp(usb_pid,"1506",4))
 		{
-			SLOGI("Probably ZTE MF398u1 connected...Adding manually to option drv...\n");
+			SLOGI("Probably ZTE MF398u1 connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}				
 		else if(!strncasecmp(usb_vid,"19d2",4) && !strncasecmp(usb_pid,"0167",4)) 
 		{
-			SLOGI("Probably ZTE MF821 connected...Adding manually to option drv...\n");
+			SLOGI("Probably ZTE MF821 connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}		
 		else if(!strncasecmp(usb_vid,"0421",4) && !strncasecmp(usb_pid,"061e",4))
 		{
-			SLOGI("Probably NOKIA CS-11 connected...Adding manually to option drv...\n");
+			SLOGI("Probably NOKIA CS-11 connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}	
 		else if(!strncasecmp(usb_vid,"0421",4) && !strncasecmp(usb_pid,"0638",4)) 
 		{
-			SLOGI("Probably NOKIA 21M-02 connected...Adding manually to option drv...\n");
+			SLOGI("Probably NOKIA 21M-02 connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}	
 		else if(!strncasecmp(usb_vid,"0af0",4) && !strncasecmp(usb_pid,"d157",4))
 		{
-			SLOGI("Probably OPTION ICON 515M connected...Adding manually to option drv...\n");
+			SLOGI("Probably OPTION ICON 515M connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}	
 		else if(!strncasecmp(usb_vid,"12d1",4) && !strncasecmp(usb_pid,"1411",4))
 		{
-			SLOGI("HUAWEI E510 connected...Adding manually to option drv...\n");
+			SLOGI("HUAWEI E510 connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}
 		else if(!strncasecmp(usb_vid,"2001",4) && (!strncasecmp(usb_pid,"7d01",4) || !strncasecmp(usb_pid,"7d02",4) || !strncasecmp(usb_pid,"7d03",4))) 
 		{
-			SLOGI("A D-Link MODEM connected...Adding manually to option drv...\n");
+			SLOGI("A D-Link MODEM connected...Adding manually to option drv...");
 			addmanually(usb_vid,usb_pid);
 		}	
 		property_get("gsm.ril.switch.vid",oldVid,"");
@@ -203,7 +203,7 @@ char oldPid[PROPERTY_VALUE_MAX] = {0};
 		
 		if(!strncasecmp(oldVid,"19d2",4) && !strncasecmp(oldPid,"f006",4) && !strncasecmp(usb_pid,"2000",4)) 
 		{
-			SLOGI("Probably ZTE K3570-Z connected...Reseting...\n");
+			SLOGI("Probably ZTE K3570-Z connected...Reseting...");
 			switchcount--;
 			strcpy(oldVid, "");
 			strcpy(oldPid, "");
@@ -223,6 +223,7 @@ char oldPid[PROPERTY_VALUE_MAX] = {0};
 			if(!f) SLOGI("Warning! Configuration file doesn't exist for %s_%s!",usb_vid, usb_pid);
 			else fclose(f);
 			SLOGI("Switching device...");
+			property_set("gsm.ril.switch.running","1");
 			asprintf(&cmd, "usb_modeswitch -W -I -v %s -p %s -c %s &",usb_vid, usb_pid, fname);
 			ret = system(cmd); 
 			free(cmd);
@@ -233,6 +234,8 @@ char oldPid[PROPERTY_VALUE_MAX] = {0};
 				property_set("gsm.ril.switch.vid",usb_vid);
 				property_set("gsm.ril.switch.pid",usb_pid);
 			}
+			sleep(2);
+			property_set("gsm.ril.switch.running","0");
 		}
 	} 
 	if(!strcmp(evt->action, "remove") && !strcmp(devtype, "usb_device")) 
@@ -265,9 +268,9 @@ static void on_uevent(struct uevent *event)
 
 int main()
 {	
-	SLOGI("------------------------------------------------------------------------------------------");
+	SLOGI("-------------------------------------------------------------------");
 	SLOGI("USB3G Monitor ver. 0.1f fixed by lolet -- built on %s, %s",__DATE__, __TIME__); 
-	SLOGI("------------------------------------------------------------------------------------------");
+	SLOGI("-------------------------------------------------------------------");
 	uevent_init();
 	coldboot("/sys/devices");
 	uevent_next_event(on_uevent);	
